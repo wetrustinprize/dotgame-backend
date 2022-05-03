@@ -6,8 +6,10 @@ generator client {
 }
 
 generator nestgraphql {
-  provider = "node node_modules/prisma-nestjs-graphql"
-  output   = "../src/@generated/prisma"
+  provider          = "node node_modules/prisma-nestjs-graphql"
+  output            = "../src/@generated/prisma"
+  outputFilePattern = "{model}/{plural.type}/{name}.{type}.ts"
+  purgeOutput       = true
 }
 
 datasource db {
@@ -21,6 +23,7 @@ model User {
   id String @id @default(uuid())
 
   username String @unique
+  /// @HideField()
   password String
 
   PlayerInGame PlayerInGame[]
