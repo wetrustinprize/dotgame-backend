@@ -31,7 +31,7 @@ describe('Auth Service', () => {
     service.validatePassword = jest.fn().mockReturnValue(true);
 
     // Call service
-    const result = await service.signIn('test', 'test');
+    const result = await service.signIn({ password: 'test', username: 'test' });
 
     // Expect
     expect(result).toEqual({
@@ -39,7 +39,6 @@ describe('Auth Service', () => {
       user: {
         id: '1',
         username: 'test',
-        password: 'test',
       },
     });
   });
@@ -52,8 +51,8 @@ describe('Auth Service', () => {
     service.validatePassword = jest.fn().mockReturnValue(false);
 
     // Call service and expect
-    await expect(service.signIn('test', 'test')).rejects.toThrow(
-      'password_incorrect',
-    );
+    await expect(
+      service.signIn({ password: 'test', username: 'test' }),
+    ).rejects.toThrow('password_incorrect');
   });
 });

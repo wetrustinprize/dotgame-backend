@@ -1,13 +1,22 @@
-describe('Auth Resolver', () => {
-  describe('Sign In', () => {
-    it.todo('Should not accept empty username');
+import { AuthResolver } from 'auth/auth.resolver';
+import { AuthService } from 'auth/auth.service';
 
-    it.todo('Should not accept empty password');
+describe('Auth Resolver', () => {
+  let resolver: AuthResolver;
+
+  beforeEach(() => {
+    resolver = new AuthResolver({} as AuthService);
   });
 
-  describe('Me', () => {
-    it.todo('Should return the logged user');
+  it('Should not accept empty username', () => {
+    expect(
+      resolver.signIn({ password: 'test', username: '' }),
+    ).rejects.toThrow();
+  });
 
-    it.todo('Should return an error if user is not logged');
+  it('Should not accept empty password', () => {
+    expect(
+      resolver.signIn({ password: '', username: 'test' }),
+    ).rejects.toThrow();
   });
 });
