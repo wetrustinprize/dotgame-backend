@@ -1,0 +1,61 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""The game board"""
+type Board {
+  height: Float!
+  width: Float!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+"""The game object"""
+type Game {
+  """The game object"""
+  board: Board!
+
+  """When the game was created"""
+  createdAt: DateTime!
+  id: ID!
+
+  """Last time the game was updated"""
+  updatedAt: DateTime!
+}
+
+type Mutation {
+  createUser(
+    """The password of the user, minimum of 6 characters."""
+    password: String!
+    username: String!
+  ): User!
+}
+
+"""The player in the game"""
+type PlayerInGame {
+  game: Game!
+  gameId: ID!
+  id: ID!
+  player: String!
+  playerId: ID!
+}
+
+type Query {
+  getUserById(id: String!): User!
+  sayHello: String!
+}
+
+"""The user object"""
+type User {
+  createdAt: DateTime!
+  id: ID!
+  password: String!
+
+  """The games this player has been"""
+  playerInGame: PlayerInGame!
+  updatedAt: DateTime!
+  username: String!
+}
