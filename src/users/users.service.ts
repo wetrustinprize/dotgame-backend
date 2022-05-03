@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDTO } from './dtos/user-create.dto';
@@ -7,7 +11,17 @@ import { CreateUserDTO } from './dtos/user-create.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(userData: CreateUserDTO): Promise<User> {
+  async create(userData: CreateUserDTO) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username: userData.username,
+      },
+    });
+
+    // Check if username is already in user
+    if (user) throw new BadRequestException('username_in_use');
+
+    // Creates the new user
     return await this.prisma.user.create({
       data: userData,
       include: {
@@ -16,8 +30,8 @@ export class UsersService {
     });
   }
 
-  async findById(id: string): Promise<User> {
-    return await this.prisma.user.findUnique({
+  async findById(id: string) {
+    const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
@@ -25,5 +39,10 @@ export class UsersService {
         PlayerInGame: true,
       },
     });
+
+    // Check if user exists
+    if (!user) throw new NotFoundException('user_not_found');
+
+    return user;
   }
 }
