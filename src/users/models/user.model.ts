@@ -9,8 +9,10 @@ export class User {
   @Field()
   username: string;
 
-  @Field(() => PlayerInGame, { description: 'The games this player has been' })
-  playerInGame: PlayerInGame[];
+  @Field(() => PlayerInGame, {
+    description: 'The games this player is related',
+  })
+  PlayerInGame: PlayerInGame[];
 
   @Field()
   createdAt: Date;
