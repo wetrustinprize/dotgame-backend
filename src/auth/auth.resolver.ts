@@ -7,7 +7,9 @@ import { SignInDto } from './dtos/signin.dto';
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation(() => SignInResponseDto)
+  @Mutation(() => SignInResponseDto, {
+    description: 'Sign in with the username and password, returns a JWT',
+  })
   async signIn(@Args() signInData: SignInDto): Promise<SignInResponseDto> {
     return this.authService.signIn(signInData);
   }
