@@ -5,6 +5,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator nestgraphql {
+  provider = "node node_modules/prisma-nestjs-graphql"
+  output   = "../src/@generated/prisma"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -15,7 +20,7 @@ datasource db {
 model User {
   id String @id @default(uuid())
 
-  username String
+  username String @unique
   password String
 
   PlayerInGame PlayerInGame[]
