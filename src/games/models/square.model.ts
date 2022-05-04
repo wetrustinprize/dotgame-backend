@@ -1,5 +1,4 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Line } from './line.model';
 
 // Line position enum
 export enum LinePosition {
@@ -17,23 +16,23 @@ registerEnumType(LinePosition, {
 @ObjectType({ description: 'A cube in the game board' })
 export class Square {
   // Public access variables
-  @Field(() => Line, { nullable: false })
-  get top(): Line {
+  @Field(() => String, { nullable: false })
+  get top(): string {
     return this._top;
   }
 
-  @Field(() => Line, { nullable: false })
-  get bottom(): Line {
+  @Field(() => String, { nullable: false })
+  get bottom(): string {
     return this._bottom;
   }
 
-  @Field(() => Line, { nullable: false })
-  get left(): Line {
+  @Field(() => String, { nullable: false })
+  get left(): string {
     return this._left;
   }
 
-  @Field(() => Line, { nullable: false })
-  get right(): Line {
+  @Field(() => String, { nullable: false })
+  get right(): string {
     return this._right;
   }
 
@@ -46,20 +45,20 @@ export class Square {
   }
 
   // Private access variables
-  private _top: Line;
-  private _bottom: Line;
-  private _left: Line;
-  private _right: Line;
+  private _top: string;
+  private _bottom: string;
+  private _left: string;
+  private _right: string;
 
   private _playerId: string;
 
   // Constructor
   constructor() {
     // Set the lines
-    this._top = new Line();
-    this._bottom = new Line();
-    this._left = new Line();
-    this._right = new Line();
+    this._top = 'none';
+    this._bottom = 'none';
+    this._left = 'none';
+    this._right = 'none';
 
     // Set no player
     this._playerId = 'none';
@@ -68,15 +67,14 @@ export class Square {
   // Methods
   public drawLine(direction: LinePosition, playerId: string): void {
     // Check if line is drawn
-    if (this['_' + direction].playerId !== 'none')
-      throw new Error('line_drawn');
+    if (this['_' + direction] !== 'none') throw new Error('line_drawn');
 
     // Set the new owner of the line
-    this['_' + direction].setPlayerId(playerId);
+    this['_' + direction] = playerId;
 
     // Check if the square is complete
     const complete: boolean = ['top', 'bottom', 'left', 'right'].every(
-      (position) => this['_' + position].playerId !== 'none',
+      (position) => this['_' + position] !== 'none',
     );
 
     if (complete) this._playerId = playerId;
