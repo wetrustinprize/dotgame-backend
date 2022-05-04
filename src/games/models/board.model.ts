@@ -1,4 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { CreateBoardDTO } from 'games/dtos/create-board.dto';
 import { LinePosition, Square } from './square.model';
 @ObjectType({ description: 'The game board' })
@@ -42,7 +43,25 @@ export class Board {
     );
   }
 
+  // Static methods
+  static fromJSON(json: any): Board {
+    const jsonParsed = JSON.parse(json);
+
+    const board: Board = Object.setPrototypeOf(jsonParsed, Board.prototype);
+    const squares: Square[][] = jsonParsed._squares.map((line: Square[]) =>
+      line.map((square) => Object.setPrototypeOf(square, Square.prototype)),
+    );
+
+    board._squares = squares;
+
+    return board;
+  }
+
   // Methods
+  public toJSON(): any {
+    return JSON.stringify(instanceToPlain(this));
+  }
+
   public drawLine(
     x: number,
     y: number,
