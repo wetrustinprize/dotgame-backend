@@ -10,6 +10,11 @@ import { CreateUserDTO } from './dtos/user-create.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Creates a new user
+   * @param userData User data to create
+   * @returns The created user
+   */
   async create(userData: CreateUserDTO) {
     const user = await this.prisma.user.findUnique({
       where: {
@@ -29,6 +34,11 @@ export class UsersService {
     });
   }
 
+  /**
+   * Find a user by its id.
+   * @param id User id to find
+   * @returns The found user
+   */
   async findById(id: string) {
     const user = await this.prisma.user.findUnique({
       where: {
