@@ -42,6 +42,40 @@ export class GamesService {
   }
 
   /**
+   * Gets the game by ID and checks if the user is related to it
+   * @param user The user who is requesting the game
+   * @param gameId The game ID
+   * @returns The game
+   */
+  async getGame(user: User, gameId: string): Promise<Game> {
+    // Gets the game
+    const game = await this.prismaService.game.findUnique({
+      where: {
+        id: gameId,
+      },
+      include: {
+        PlayerInGame: true,
+      },
+    });
+
+    // Check if game exists
+    if (!game) throw new NotFoundException('game_not_found');
+
+    // Check if player is related to game
+    const playerInGame = game.PlayerInGame.find(
+      (player) => player.playerId === user.id,
+    );
+
+    if (!playerInGame) throw new UnauthorizedException('player_not_in_game');
+
+    // Return the game
+    return {
+      ...game,
+      board: Board.fromJSON(game.board),
+    };
+  }
+
+  /**
    * Draws a line in the game
    * @param user The user who is drawing the line
    * @param gameId The game ID

@@ -11,6 +11,15 @@ import { GamesService } from './games.service';
 export class GamesResolver {
   constructor(private readonly gamesService: GamesService) {}
 
+  @Query(() => Game)
+  @UseGuards(LoggedGuard)
+  async getGame(
+    @CurrentUser() user: User,
+    @Args('id') gameId: string,
+  ): Promise<Game> {
+    return this.gamesService.getGame(user, gameId);
+  }
+
   @Mutation(() => Game)
   @UseGuards(LoggedGuard)
   async createGame(
