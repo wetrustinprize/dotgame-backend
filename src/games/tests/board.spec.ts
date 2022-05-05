@@ -1,4 +1,5 @@
 import { Board } from 'games/models/board.model';
+import { ScoreboardEntry } from 'games/models/scoreboard.model';
 import { LinePosition } from 'games/models/square.model';
 
 describe('Game Board', () => {
@@ -52,6 +53,20 @@ describe('Game Board', () => {
       board.drawLine(0, 0, LinePosition.Left, 'player1');
 
       expect(board.squares[0][0].playerId).toBe('player1');
+    });
+
+    it('Should be able to get a scoreboard', () => {
+      const board = new Board({ height: 12, width: 12 });
+
+      board.drawLine(0, 0, LinePosition.Top, 'player1');
+      board.drawLine(0, 0, LinePosition.Right, 'player2');
+      board.drawLine(0, 0, LinePosition.Left, 'player2');
+      board.drawLine(0, 0, LinePosition.Bottom, 'player2');
+
+      expect(board.scoreBoard).toEqual([
+        new ScoreboardEntry('player2', 1, 3),
+        new ScoreboardEntry('player1', 0, 1),
+      ]);
     });
 
     it('Should not be able to draw a line outside the board', () => {
