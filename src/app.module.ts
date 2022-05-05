@@ -23,6 +23,9 @@ import { AuthModule } from 'auth/auth.module';
       sortSchema: true,
       playground: true,
       introspection: true,
+      subscriptions: {
+        'subscriptions-transport-ws': true,
+      },
       context: ({ req }) => {
         req;
       },

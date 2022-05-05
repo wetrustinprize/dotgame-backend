@@ -37,6 +37,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "graphql": "^16.4.0",
+    "graphql-subscriptions": "^2.0.0",
     "graphql-type-json": "^0.3.2",
     "passport": "^0.5.2",
     "passport-jwt": "^4.0.0",
