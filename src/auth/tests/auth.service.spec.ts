@@ -7,7 +7,7 @@ describe('Auth Service', () => {
   let jwtService: JwtService;
   let prismaService: PrismaService;
 
-  const testUser = {
+  const mockUser = {
     id: '1',
     username: 'test',
     password: 'test',
@@ -25,7 +25,7 @@ describe('Auth Service', () => {
 
   it('should sign in', async () => {
     // Mock prisma
-    prismaService.user.findUnique = jest.fn().mockReturnValueOnce(testUser);
+    prismaService.user.findUnique = jest.fn().mockReturnValueOnce(mockUser);
 
     // Mock bcrypt
     service.validatePassword = jest.fn().mockReturnValue(true);
@@ -45,7 +45,7 @@ describe('Auth Service', () => {
 
   it('should error if password incorrect', async () => {
     // Mock prisma
-    prismaService.user.findUnique = jest.fn().mockReturnValueOnce(testUser);
+    prismaService.user.findUnique = jest.fn().mockReturnValueOnce(mockUser);
 
     // Mock bcrypt
     service.validatePassword = jest.fn().mockReturnValue(false);
