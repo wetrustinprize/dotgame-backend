@@ -30,7 +30,7 @@ describe('Game Board', () => {
 
       board.drawLine(0, 0, LinePosition.Top, 'player1');
 
-      expect(board.squares[0][0].top.playerId).toBe('player1');
+      expect(board.squares[0][0].top).toBe('player1');
     });
 
     it('Should not be able to draw a line on a taken line', () => {
