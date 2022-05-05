@@ -30,25 +30,25 @@ describe('Games Service', () => {
   });
 
   describe('Get a game', () => {
-    it('Should be able to get a game related to the user', async () => {
+    it('Should be able to get a game', async () => {
       // Mock prisma
       prismaService.game.findUnique = jest.fn().mockReturnValueOnce(mockGame);
 
       // Call service
-      const result = await service.getGame(mockUser as User, mockGame.id);
+      const result = await service.getGame(mockGame.id);
 
       // Expect
       expect(result.id).toEqual(mockGame.id);
     });
 
-    it('Should not be able to get a game not related to a user', async () => {
+    it('Should not be able to get a game with invalid ID', async () => {
       // Mock prisma
-      prismaService.game.findUnique = jest.fn().mockReturnValueOnce(mockGame);
+      prismaService.game.findUnique = jest.fn().mockReturnValueOnce(undefined);
 
       // Call service and expect error
-      await expect(
-        service.getGame({ id: '2' } as User, mockGame.id),
-      ).rejects.toThrow('player_not_in_game');
+      await expect(service.getGame('invalid')).rejects.toThrow(
+        'game_not_found',
+      );
     });
   });
 
