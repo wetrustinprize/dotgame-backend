@@ -65,7 +65,14 @@ export class Square {
   }
 
   // Methods
-  public drawLine(direction: LinePosition, playerId: string): void {
+
+  /**
+   * Draws a specific line on this square
+   * @param direction The line direction
+   * @param playerId The player ID who is drawing the line
+   * @returns True if the square was fully drawn, false otherwise
+   */
+  public drawLine(direction: LinePosition, playerId: string): boolean {
     // Check if line is drawn
     if (this['_' + direction] !== 'none') throw new Error('line_drawn');
 
@@ -78,5 +85,6 @@ export class Square {
     );
 
     if (complete) this._playerId = playerId;
+    return complete;
   }
 }
