@@ -71,8 +71,8 @@ model Game {
   ownerId String
   owner   User   @relation(name: "ownerPlayer", fields: [ownerId], references: [id], onDelete: SetNull)
 
-  winnerPlayerId String
-  winnerPlayer   User   @relation(name: "winnerPlayer", fields: [winnerPlayerId], references: [id], onDelete: SetNull)
+  winnerPlayerId String?
+  winnerPlayer   User?   @relation(name: "winnerPlayer", fields: [winnerPlayerId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
