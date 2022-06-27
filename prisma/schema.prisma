@@ -63,7 +63,7 @@ model Game {
 
   PlayerInGame PlayerInGame[]
 
-  currentPlayerOrder Int
+  currentPlayerOrder Int @default(0)
 
   lines Json
   state GameState
