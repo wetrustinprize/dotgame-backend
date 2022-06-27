@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'prisma.service';
 import { CreateUserDTO } from './dtos/user-create.dto';
+import { UsernameInUseError, UserNotFoundError } from './user.errors';
 
 @Injectable()
 export class UsersService {
@@ -23,7 +24,7 @@ export class UsersService {
     });
 
     // Check if username is already in user
-    if (user) throw new BadRequestException('username_in_use');
+    if (user) throw UsernameInUseError;
 
     // Creates the new user
     return await this.prisma.user.create({
@@ -50,7 +51,7 @@ export class UsersService {
     });
 
     // Check if user exists
-    if (!user) throw new NotFoundException('user_not_found');
+    if (!user) throw UserNotFoundError;
 
     return user;
   }

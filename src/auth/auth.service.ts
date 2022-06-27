@@ -9,6 +9,8 @@ import { PrismaService } from 'prisma.service';
 
 import * as bcrypt from 'bcryptjs';
 import { SignInDto } from './dtos/signin.dto';
+import { UserNotFoundError } from 'users/user.errors';
+import { InvalidPasswordError } from './auth.errors';
 
 @Injectable()
 export class AuthService {
@@ -25,11 +27,11 @@ export class AuthService {
     });
 
     // Check if user exists
-    if (!user) throw new NotFoundException('user_not_found');
+    if (!user) throw UserNotFoundError;
 
     // Check password
     if (!this.validatePassword(password, user.password))
-      throw new UnauthorizedException('password_incorrect');
+      throw InvalidPasswordError;
 
     // Remove the user password
     delete user.password;
