@@ -47,6 +47,7 @@ model PlayerInGame {
   game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
 
   playOrder Int
+  leaved    Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
