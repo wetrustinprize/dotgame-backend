@@ -5,6 +5,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'auth/current-user.decorator';
 import { LoggedGuard } from 'auth/logged.guard';
 import { CreateGameDto } from './dtos/create-game.dto';
+import { JoinGameDto } from './dtos/join-game.dto';
 import { GamesService } from './games.service';
 
 @Resolver(() => Game)
@@ -24,11 +25,17 @@ export class GamesResolver {
   }
 
   @Mutation(() => Game, {
-    description: 'Cancels the current created or joined waiting game',
+    description: 'Cancels the current created waiting game',
   })
   @UseGuards(LoggedGuard)
   cancelGame(@CurrentUser() user: User): Promise<Game> {
     return this.gamesService.cancelGame(user.id);
+  }
+
+  @Mutation(() => Game, { description: "Leaves the user's current game" })
+  @UseGuards(LoggedGuard)
+  leaveGame(@CurrentUser() user: User): Promise<Game | null> {
+    return this.gamesService.leaveGame(user.id);
   }
 
   @Query(() => Game, {
@@ -38,5 +45,15 @@ export class GamesResolver {
   @UseGuards(LoggedGuard)
   currentGame(@CurrentUser() user: User): Promise<Game | null> {
     return this.gamesService.getCurrentGame(user.id);
+  }
+
+  @Mutation(() => Game, { description: 'Leaves the current game' })
+  @Mutation(() => Game, { description: 'Join a game by its id' })
+  @UseGuards(LoggedGuard)
+  joinGame(
+    @Args() joinGameData: JoinGameDto,
+    @CurrentUser() user: User,
+  ): Promise<Game> {
+    return this.gamesService.joinGame(joinGameData, user.id);
   }
 }

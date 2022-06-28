@@ -2,10 +2,13 @@ import { Game } from '@generated/prisma/game/models/game.model';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma.service';
 import { CreateGameDto } from './dtos/create-game.dto';
+import { JoinGameDto } from './dtos/join-game.dto';
 import {
   AlreadyInGameError,
   AlreadyOwnsGameError,
+  GameAlreadyStartedError,
   NoGameInWaitingError,
+  NotInGameError,
 } from './games.errors';
 import Board from './models/board';
 
@@ -102,6 +105,7 @@ export class GamesService {
     const playerInGame = await this.prismaService.playerInGame.findFirst({
       where: {
         playerId: userId,
+        leaved: false,
         game: {
           state: {
             not: 'Ended',
@@ -117,21 +121,107 @@ export class GamesService {
   }
 
   /**
+   * Leaves the user's current game
+   * @param userId The user id
+   * @returns The updated game
+   */
+  async leaveGame(userId: string): Promise<Game> {
+    // Check if user is in a game
+    const currentGame = await this.getCurrentGame(userId);
+
+    if (!currentGame) throw NotInGameError;
+
+    // Update the player in game
+    await this.prismaService.playerInGame.updateMany({
+      where: {
+        playerId: userId,
+        gameId: currentGame.id,
+      },
+      data: {
+        leaved: true,
+      },
+    });
+
+    return this.prismaService.game.findUnique({
+      where: { id: currentGame.id },
+    });
+  }
+
+  /**
+   * Make the player join a game by its id
+   * @param userId The user id
+   * @param gameId The game id
+   * @returns The game
+   */
+  async joinGame(joinGameData: JoinGameDto, userId: string): Promise<Game> {
+    // Check if the user is already in a game
+    if (await this.checkPlayerInGame(userId)) throw AlreadyInGameError;
+
+    // Check if game is in waiting state
+    const game = await this.prismaService.game.findFirst({
+      where: {
+        id: joinGameData.id,
+      },
+    });
+
+    if (game.state !== 'Waiting') throw GameAlreadyStartedError;
+
+    // Check last playOrder
+    const { playOrder } = await this.prismaService.playerInGame.findFirst({
+      where: {
+        gameId: joinGameData.id,
+      },
+      orderBy: {
+        playOrder: 'desc',
+      },
+    });
+
+    // Create player in game
+    await this.prismaService.playerInGame.create({
+      data: {
+        playOrder: playOrder + 1,
+        player: {
+          connect: {
+            id: userId,
+          },
+        },
+        game: {
+          connect: {
+            id: joinGameData.id,
+          },
+        },
+      },
+    });
+
+    // Return the game
+    return this.prismaService.game.findUnique({
+      where: { id: joinGameData.id },
+    });
+  }
+
+  /**
    * Check if the player owns a not ended game.
    * @param userId The user id
    * @returns Boolean indicating if the user owns a not ended game
    */
   async checkPlayerOwnsGame(userId: string): Promise<Game | null> {
-    const game = await this.prismaService.game.findFirst({
+    const playerInGame = await this.prismaService.playerInGame.findFirst({
       where: {
-        ownerId: userId,
-        state: {
-          not: 'Ended',
+        leaved: false,
+        playerId: userId,
+        game: {
+          ownerId: userId,
+          state: {
+            not: 'Ended',
+          },
         },
+      },
+      include: {
+        game: true,
       },
     });
 
-    return game;
+    return playerInGame ? playerInGame.game : null;
   }
 
   /**
