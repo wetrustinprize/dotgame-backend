@@ -131,17 +131,35 @@ export class GamesService {
 
     if (!currentGame) throw NotInGameError;
 
-    // Update the player in game
-    await this.prismaService.playerInGame.updateMany({
-      where: {
-        playerId: userId,
-        gameId: currentGame.id,
-      },
-      data: {
-        leaved: true,
-      },
-    });
+    // Check if player is in playing state
+    if (currentGame.state === 'Playing') {
+      // Update the player in game
+      await this.prismaService.playerInGame.updateMany({
+        where: {
+          playerId: userId,
+          gameId: currentGame.id,
+        },
+        data: {
+          leaved: true,
+        },
+      });
+    } else {
+      // Otherwise, check if the user is the game owner
+      if (currentGame.ownerId === userId) {
+        // Cancel the game
+        return await this.cancelGame(userId);
+      } else {
+        // Otherwise, delete the player in game
+        await this.prismaService.playerInGame.deleteMany({
+          where: {
+            playerId: userId,
+            gameId: currentGame.id,
+          },
+        });
+      }
+    }
 
+    // Return the updated game
     return this.prismaService.game.findUnique({
       where: { id: currentGame.id },
     });
