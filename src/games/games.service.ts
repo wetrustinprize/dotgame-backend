@@ -143,6 +143,31 @@ export class GamesService {
           leaved: true,
         },
       });
+
+      // Check if there's any player left in the game
+      const totalPlayers = await this.prismaService.playerInGame.findMany({
+        where: {
+          gameId: currentGame.id,
+          leaved: false,
+        },
+      });
+
+      if (totalPlayers.length === 1) {
+        // If there's no player left, update the game state and set the winner
+        await this.prismaService.game.update({
+          where: {
+            id: currentGame.id,
+          },
+          data: {
+            state: 'Ended',
+            winnerPlayer: {
+              connect: {
+                id: totalPlayers[0].playerId,
+              },
+            },
+          },
+        });
+      }
     } else {
       // Otherwise, check if the user is the game owner
       if (currentGame.ownerId === userId) {

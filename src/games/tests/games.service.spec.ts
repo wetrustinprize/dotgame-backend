@@ -1,4 +1,5 @@
 import { Game } from '@generated/prisma/game/models/game.model';
+import { User } from '@generated/prisma/user/models/user.model';
 import { PlayerInGame } from '@prisma/client';
 import {
   AlreadyInGameError,
@@ -85,6 +86,27 @@ describe('Games Service', () => {
 
       // Call service and expect
       expect(service.leaveGame('1')).rejects.toThrow(NotInGameError);
+    });
+
+    it('Should set the winner if all the other players left', async () => {
+      // Mock prisma
+      prismaService.playerInGame.updateMany = jest.fn();
+      prismaService.game.update = jest.fn();
+      prismaService.game.findUnique = jest.fn();
+
+      prismaService.playerInGame.findMany = jest
+        .fn()
+        .mockReturnValueOnce([{ id: '0' } as Partial<User>]);
+      prismaService.playerInGame.findFirst = jest.fn().mockReturnValueOnce({
+        game: {
+          state: 'Playing',
+        },
+      } as Partial<PlayerInGame & { game: Partial<Game> }>);
+
+      // Call service and expect
+      await service.leaveGame('1');
+
+      expect(prismaService.game.update).toHaveBeenCalled();
     });
   });
 
