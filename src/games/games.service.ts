@@ -1,4 +1,6 @@
 import { Game } from '@generated/prisma/game/models/game.model';
+import { PlayerInGame } from '@generated/prisma/player-in-game/models/player-in-game.model';
+import { User } from '@generated/prisma/user/models/user.model';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma.service';
 import { CreateGameDto } from './dtos/create-game.dto';
@@ -288,5 +290,46 @@ export class GamesService {
     });
 
     return playerInGame ? playerInGame.game : null;
+  }
+
+  /**
+   * Gets the game owner user information
+   * @param gameId The game id
+   * @returns The game owner
+   */
+  async getOwner(gameId: string): Promise<User> {
+    const game = await this.prismaService.game.findUnique({
+      where: { id: gameId },
+      include: { owner: true },
+    });
+
+    return game.owner;
+  }
+
+  /**
+   * Gets the game winner user information
+   * @param gameId The game id
+   * @returns The game winner
+   */
+  async getWinnerPlayer(gameId: string): Promise<User> {
+    const game = await this.prismaService.game.findUnique({
+      where: { id: gameId },
+      include: { winnerPlayer: true },
+    });
+
+    return game.winnerPlayer;
+  }
+
+  /**
+   * Gets the players in the game
+   * @param gameId The game id
+   * @returns The players in the game
+   */
+  async getPlayersInGame(gameId: string): Promise<PlayerInGame[]> {
+    return await this.prismaService.playerInGame.findMany({
+      where: {
+        gameId: gameId,
+      },
+    });
   }
 }
