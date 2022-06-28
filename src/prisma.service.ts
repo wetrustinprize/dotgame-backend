@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 import * as bcrypt from 'bcryptjs';
@@ -16,7 +16,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       ) {
         const { password } = params.args.data;
 
-        if (!password) return;
+        if (!password) return next(params);
 
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(password, salt);
@@ -25,6 +25,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       }
 
       return next(params);
+    });
+  }
+
+  async enableShutdownHooks(app: INestApplication) {
+    this.$on('beforeExit', async () => {
+      await app.close();
     });
   }
 }
