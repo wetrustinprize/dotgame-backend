@@ -47,7 +47,6 @@ export class GamesResolver {
     return this.gamesService.getCurrentGame(user.id);
   }
 
-  @Mutation(() => Game, { description: 'Leaves the current game' })
   @Mutation(() => Game, { description: 'Join a game by its id' })
   @UseGuards(LoggedGuard)
   joinGame(
